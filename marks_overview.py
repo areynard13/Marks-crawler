@@ -576,7 +576,8 @@ def display_selected_student(all_data):
     st.subheader(f"Notes {selected_student_name}")
     summary_data = []
     for filename, module_data in student_data.items():
-        filename_short = filename.split("2024-2025")[0]
+        module_year = filename.split(" ")[-1].split(".xlsx")[0]
+        filename_short = filename.split(module_year)[0]
         success = module_data["Module"]
         mark_final = module_data["Note du module"]
         mark_with_detail = round(module_data["Note avant arrondi"], 1)
@@ -601,7 +602,8 @@ def display_selected_student(all_data):
 
 
     for filename, module_data in student_data.items():
-        filename = filename.split("2024-2025")[0]
+        module_year = filename.split(" ")[-1].split(".xlsx")[0]
+        filename = filename.split(module_year)[0]
 
         # st.write(f"{filename} - Note du module {mark}, module {success}")
         st.write(f"{filename}")
@@ -781,3 +783,4 @@ st.sidebar.markdown("version : " + git_describe())
 # add_selectbox = st.sidebar.selectbox(
 #     "Academic year", default_years, index=len(default_years) - 1
 # )
+
