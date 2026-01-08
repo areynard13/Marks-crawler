@@ -164,11 +164,22 @@ def load_all_data(iofiles):
                 Only includes .xlsx files and excludes temporary files (starting with '~').
     """
     all_data = {}
+    module_years = set()
+
     for file in iofiles:
         filename = file.name
         if filename.endswith(".xlsx") and not filename.startswith("~"):
+
+            module_year = filename.split(" ")[-1].replace(".xlsx", "")
+            module_years.add(module_year)
+            
             df = load_and_mangle_data(file)
             all_data[filename] = df
+
+    if len(module_years) > 1:
+        years_list = ", ".join(sorted(module_years))
+        st.warning(f"Warning: The files do not all correspond to the same year : {years_list}", icon="⚠️")
+    
     return all_data
 
 #all_data = load_all_data("res/marks")
