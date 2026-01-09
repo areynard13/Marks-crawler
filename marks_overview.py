@@ -170,7 +170,7 @@ def load_all_data(iofiles):
         filename = file.name
         if filename.endswith(".xlsx") and not filename.startswith("~"):
 
-            module_year = filename.split(" ")[-1].replace(".xlsx", "")
+            module_year = extract_module_year_from_filename(filename)
             module_years.add(module_year)
             
             df = load_and_mangle_data(file)
@@ -220,6 +220,13 @@ def replace_nan_in_display(element):
     if isinstance(element, float) and math.isnan(element):
         return "None"
     return element
+
+def extract_module_year_from_filename(filename):
+    """Extracts the module year from a given filename.
+        Respecting the format : "ModuleName 2025-2026.xlsx"
+    """
+    return filename.split(" ")[-1].replace(".xlsx", "")
+
 
 def filter_dataframe(df: pd.DataFrame) -> pd.DataFrame:
     """
@@ -587,7 +594,7 @@ def display_selected_student(all_data):
     st.subheader(f"Notes {selected_student_name}")
     summary_data = []
     for filename, module_data in student_data.items():
-        module_year = filename.split(" ")[-1].split(".xlsx")[0]
+        module_year = extract_module_year_from_filename(filename)
         filename_short = filename.split(module_year)[0]
         success = module_data["Module"]
         mark_final = module_data["Note du module"]
@@ -613,7 +620,7 @@ def display_selected_student(all_data):
 
 
     for filename, module_data in student_data.items():
-        module_year = filename.split(" ")[-1].split(".xlsx")[0]
+        module_year = extract_module_year_from_filename(filename)
         filename = filename.split(module_year)[0]
 
         # st.write(f"{filename} - Note du module {mark}, module {success}")
@@ -794,4 +801,3 @@ st.sidebar.markdown("version : " + git_describe())
 # add_selectbox = st.sidebar.selectbox(
 #     "Academic year", default_years, index=len(default_years) - 1
 # )
-
