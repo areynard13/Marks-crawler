@@ -164,11 +164,22 @@ def load_all_data(iofiles):
                 Only includes .xlsx files and excludes temporary files (starting with '~').
     """
     all_data = {}
+    module_years = set()
+
     for file in iofiles:
         filename = file.name
         if filename.endswith(".xlsx") and not filename.startswith("~"):
+
+            module_year = extract_module_year_from_filename(filename)
+            module_years.add(module_year)
+            
             df = load_and_mangle_data(file)
             all_data[filename] = df
+
+    if len(module_years) > 1:
+        years_list = ", ".join(sorted(module_years))
+        st.warning(f"Warning: The files do not all correspond to the same year : {years_list}", icon="⚠️")
+    
     return all_data
 
 #all_data = load_all_data("res/marks")
@@ -209,6 +220,13 @@ def replace_nan_in_display(element):
     if isinstance(element, float) and math.isnan(element):
         return "None"
     return element
+
+def extract_module_year_from_filename(filename):
+    """Extracts the module year from a given filename.
+        Respecting the format : "ModuleName 2025-2026.xlsx"
+    """
+    return filename.split(" ")[-1].replace(".xlsx", "")
+
 
 def filter_dataframe(df: pd.DataFrame) -> pd.DataFrame:
     """
@@ -576,7 +594,8 @@ def display_selected_student(all_data):
     st.subheader(f"Notes {selected_student_name}")
     summary_data = []
     for filename, module_data in student_data.items():
-        filename_short = filename.split("2024-2025")[0]
+        module_year = extract_module_year_from_filename(filename)
+        filename_short = filename.split(module_year)[0]
         success = module_data["Module"]
         mark_final = module_data["Note du module"]
         mark_with_detail = round(module_data["Note avant arrondi"], 1)
@@ -601,7 +620,8 @@ def display_selected_student(all_data):
 
 
     for filename, module_data in student_data.items():
-        filename = filename.split("2024-2025")[0]
+        module_year = extract_module_year_from_filename(filename)
+        filename = filename.split(module_year)[0]
 
         # st.write(f"{filename} - Note du module {mark}, module {success}")
         st.write(f"{filename}")
